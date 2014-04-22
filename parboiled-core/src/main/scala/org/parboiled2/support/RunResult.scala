@@ -24,24 +24,35 @@ sealed trait RunResult[T] {
   type Out <: RuleX
 }
 
-object RunResult {
-  implicit def fromAux[T, Out0 <: RuleX](implicit aux: Aux[T, Out0]): RunResult[T] { type Out = Out0 } = `n/a`
+object RunResult extends RunResult1 {
+  import Func._
+
+  // translate function types to our own invariant F1-F5 counterparts, so we don't get bitten by variance issues in implicit resolution
+  implicit def fromAux1[A, R, Out0 <: RuleX](implicit aux: Aux[F1[A, R], Out0]): RunResult[A ⇒ R] { type Out = Out0 } = `n/a`
+  implicit def fromAux2[A, B, R, Out0 <: RuleX](implicit aux: Aux[F2[A, B, R], Out0]): RunResult[(A, B) ⇒ R] { type Out = Out0 } = `n/a`
+  implicit def fromAux3[A, B, C, R, Out0 <: RuleX](implicit aux: Aux[F3[A, B, C, R], Out0]): RunResult[(A, B, C) ⇒ R] { type Out = Out0 } = `n/a`
+  implicit def fromAux4[A, B, C, D, R, Out0 <: RuleX](implicit aux: Aux[F4[A, B, C, D, R], Out0]): RunResult[(A, B, C, D) ⇒ R] { type Out = Out0 } = `n/a`
+  implicit def fromAux5[A, B, C, D, E, R, Out0 <: RuleX](implicit aux: Aux[F5[A, B, C, D, E, R], Out0]): RunResult[(A, B, C, D, E) ⇒ R] { type Out = Out0 } = `n/a`
 
   sealed trait Aux[T, Out]
   object Aux extends Aux1 {
     implicit def forRule[R <: RuleX]: Aux[R, R] = `n/a`
-    implicit def forFHList[I <: HList, R, In0 <: HList, Out0 <: HList](implicit x: JA[I, R, In0, Out0]): Aux[I ⇒ R, Rule[In0, Out0]] = `n/a`
+    implicit def forFHList[I <: HList, R, In0 <: HList, Out0 <: HList](implicit x: JA[I, R, In0, Out0]): Aux[F1[I, R], Rule[In0, Out0]] = `n/a`
   }
   abstract class Aux1 extends Aux2 {
-    implicit def forF1[Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[Z :: HNil, R, In0, Out0]): Aux[Z ⇒ R, Rule[In0, Out0]] = `n/a`
-    implicit def forF2[Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[Y :: Z :: HNil, R, In0, Out0]): Aux[(Y, Z) ⇒ R, Rule[In0, Out0]] = `n/a`
-    implicit def forF3[X, Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[X :: Y :: Z :: HNil, R, In0, Out0]): Aux[(X, Y, Z) ⇒ R, Rule[In0, Out0]] = `n/a`
-    implicit def forF4[W, X, Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[W :: X :: Y :: Z :: HNil, R, In0, Out0]): Aux[(W, X, Y, Z) ⇒ R, Rule[In0, Out0]] = `n/a`
-    implicit def forF5[V, W, X, Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[V :: W :: X :: Y :: Z :: HNil, R, In0, Out0]): Aux[(V, W, X, Y, Z) ⇒ R, Rule[In0, Out0]] = `n/a`
+    implicit def forF1[Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[Z :: HNil, R, In0, Out0]): Aux[F1[Z, R], Rule[In0, Out0]] = `n/a`
+    implicit def forF2[Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[Y :: Z :: HNil, R, In0, Out0]): Aux[F2[Y, Z, R], Rule[In0, Out0]] = `n/a`
+    implicit def forF3[X, Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[X :: Y :: Z :: HNil, R, In0, Out0]): Aux[F3[X, Y, Z, R], Rule[In0, Out0]] = `n/a`
+    implicit def forF4[W, X, Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[W :: X :: Y :: Z :: HNil, R, In0, Out0]): Aux[F4[W, X, Y, Z, R], Rule[In0, Out0]] = `n/a`
+    implicit def forF5[V, W, X, Y, Z, R, In0 <: HList, Out0 <: HList](implicit x: JA[V :: W :: X :: Y :: Z :: HNil, R, In0, Out0]): Aux[F5[V, W, X, Y, Z, R], Rule[In0, Out0]] = `n/a`
   }
 
   abstract class Aux2 {
     protected type JA[I <: HList, R, In0 <: HList, Out0 <: HList] = Join.Aux[I, HNil, HNil, R, HNil, In0, Out0]
     implicit def forAny[T]: Aux[T, Rule0] = `n/a`
   }
+}
+
+sealed trait RunResult1 {
+  implicit def fromAux[T, Out0 <: RuleX](implicit aux: RunResult.Aux[T, Out0]): RunResult[T] { type Out = Out0 } = `n/a`
 }

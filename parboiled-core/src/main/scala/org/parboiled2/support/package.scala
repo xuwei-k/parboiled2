@@ -19,3 +19,11 @@ package org.parboiled2
 package object support {
   private[parboiled2] def `n/a` = throw new IllegalStateException
 }
+
+object Func {
+  trait F1[A, R]
+  trait F2[A, B, R]
+  trait F3[A, B, C, R]
+  trait F4[A, B, C, D, R]
+  trait F5[A, B, C, D, E, R]
+}

@@ -88,19 +88,19 @@ class ActionSpec extends TestParserSpec {
       def compute[T](implicit rr: RunResult[T]): rr.Out = ???
 
       // compiles but shouldn't compile
-      compute[String ⇒ Unit]: Rule0
+      //compute[String ⇒ Unit]: Rule0
 
       // apparently this is what the compiler (erroneously?) selects
-      compute[String ⇒ Unit](RunResult.fromAux(RunResult.Aux.forAny)): Rule0
+      //compute[String ⇒ Unit](RunResult.fromAux(RunResult.Aux.forAny)): Rule0
 
       // doesn't compile but should compile
-      // compute[String ⇒ Unit]: Rule[String :: HNil, HNil]
+      compute[String ⇒ Unit]: Rule[String :: HNil, HNil]
 
       // compiles!!! This is what the compiler should select automatically but for some reason doesn't
-      compute[String ⇒ Unit](RunResult.fromAux(RunResult.Aux.forF1)): Rule[String :: HNil, HNil]
+      //compute[String ⇒ Unit](RunResult.fromAux(RunResult.Aux.forF1)): Rule[String :: HNil, HNil]
 
       // doesn't compile, why doesn't the compiler select `RunResult.Aux.forF1` when it is legal (as the previous line shows)?
-      compute[String ⇒ Unit](RunResult.fromAux): Rule[String :: HNil, HNil]
+      //compute[String ⇒ Unit](RunResult.fromAux): Rule[String :: HNil, HNil]
 
       /////////// PROBLEM END /////////////
 

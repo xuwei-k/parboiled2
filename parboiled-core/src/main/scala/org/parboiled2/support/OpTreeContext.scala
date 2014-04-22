@@ -455,17 +455,17 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
       }
 
       rrTree match {
-        case q"RunResult.this.Aux.forAny[$t]"                                   ⇒ block(argTree, c.literalTrue.tree)
+        case q"$a.Aux.forAny[$t]"                                   ⇒ block(argTree, c.literalTrue.tree)
 
-        case q"RunResult.this.Aux.forRule[$t]"                                  ⇒ expand(argTree, wrapped)
+        case q"$a.Aux.forRule[$t]"                                  ⇒ expand(argTree, wrapped)
 
-        case q"RunResult.this.Aux.forF1[$z, $r, $in, $out]($a)"                 ⇒ renderFunctionAction(r, z)
-        case q"RunResult.this.Aux.forF2[$y, $z, $r, $in, $out]($a)"             ⇒ renderFunctionAction(r, y, z)
-        case q"RunResult.this.Aux.forF3[$x, $y, $z, $r, $in, $out]($a)"         ⇒ renderFunctionAction(r, x, y, z)
-        case q"RunResult.this.Aux.forF4[$w, $x, $y, $z, $r, $in, $out]($a)"     ⇒ renderFunctionAction(r, w, x, y, z)
-        case q"RunResult.this.Aux.forF5[$v, $w, $x, $y, $z, $r, $in, $out]($a)" ⇒ renderFunctionAction(r, v, w, x, y, z)
+        case q"$a.Aux.forF1[$z, $r, $in, $out]($b)"                 ⇒ renderFunctionAction(r, z)
+        case q"$a.Aux.forF2[$y, $z, $r, $in, $out]($b)"             ⇒ renderFunctionAction(r, y, z)
+        case q"$a.Aux.forF3[$x, $y, $z, $r, $in, $out]($b)"         ⇒ renderFunctionAction(r, x, y, z)
+        case q"$a.Aux.forF4[$w, $x, $y, $z, $r, $in, $out]($b)"     ⇒ renderFunctionAction(r, w, x, y, z)
+        case q"$a.Aux.forF5[$v, $w, $x, $y, $z, $r, $in, $out]($b)" ⇒ renderFunctionAction(r, v, w, x, y, z)
 
-        case q"RunResult.this.Aux.forFHList[$il, $r, $in, $out]($a)" ⇒
+        case q"$a.Aux.forFHList[$il, $r, $in, $out]($b)" ⇒
           c.abort(argTree.pos, "`run` with a function taking an HList is not yet implemented") // TODO: implement
 
         case x ⇒ c.abort(rrTree.pos, "Unexpected RunResult.Aux: " + show(x))

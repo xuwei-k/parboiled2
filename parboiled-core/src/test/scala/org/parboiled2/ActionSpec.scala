@@ -17,6 +17,7 @@
 package org.parboiled2
 
 import shapeless._
+import org.parboiled2.support.RunResult
 
 class ActionSpec extends TestParserSpec {
 
@@ -81,7 +82,31 @@ class ActionSpec extends TestParserSpec {
     }
 
     "`run(F1producingUnit)`" in new TestParser1[Int] {
-      def targetRule = rule { push(1 :: "X" :: HNil) ~ run((x: String) ⇒ require(x == "X")) ~ EOI }
+
+      /////////// PROBLEM START /////////////
+
+      def compute[T](implicit rr: RunResult[T]): rr.Out = ???
+
+      // compiles but shouldn't compile
+      compute[String ⇒ Unit]: Rule0
+
+      // apparently this is what the compiler (erroneously?) selects
+      compute[String ⇒ Unit](RunResult.fromAux(RunResult.Aux.forAny)): Rule0
+
+      // doesn't compile but should compile
+      // compute[String ⇒ Unit]: Rule[String :: HNil, HNil]
+
+      // compiles!!! This is what the compiler should select automatically but for some reason doesn't
+      compute[String ⇒ Unit](RunResult.fromAux(RunResult.Aux.forF1)): Rule[String :: HNil, HNil]
+
+      // doesn't compile, why doesn't the compiler select `RunResult.Aux.forF1` when it is legal (as the previous line shows)?
+      compute[String ⇒ Unit](RunResult.fromAux): Rule[String :: HNil, HNil]
+
+      /////////// PROBLEM END /////////////
+
+      // Doesn't compile due to regression in Scala 2.11.0?
+      // def targetRule = rule { push(1 :: "X" :: HNil) ~ run((x: String) ⇒ require(x == "X")) ~ EOI }
+      def targetRule = rule { push(1 :: "X" :: HNil) ~ drop[String] ~ EOI }
       "" must beMatchedWith(1)
     }
 

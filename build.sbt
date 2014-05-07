@@ -66,6 +66,10 @@ val publishingSettings = Seq(
       </developer>
     </developers>)
 
+val noPublishingSettings = Seq(
+  publishArtifact := false,
+  publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo"))))
+
 /////////////////////// DEPENDENCIES /////////////////////////
 
 val paradiseVersion = "2.0.0"
@@ -78,12 +82,16 @@ val specs2ScalaCheck = "org.specs2"      %% "specs2-scalacheck" % "2.3.11"      
 
 /////////////////////// PROJECTS /////////////////////////
 
+lazy val root = project.in(file("."))
+  .aggregate(examples, parboiled, parboiledCore)
+  .settings(noPublishingSettings: _*)
+
 lazy val examples = project
   .dependsOn(parboiled)
   .settings(commonSettings: _*)
   .settings(cappiSettings: _*)
+  .settings(noPublishingSettings: _*)
   .settings(
-    publishTo := None,
     libraryDependencies ++= Seq(
       specs2Core,
       "io.spray" %%  "spray-json" % "1.2.6",

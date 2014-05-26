@@ -447,8 +447,7 @@ object Parser {
         case q"$p.$r" if p.tpe <:< typeOf[Parser] ⇒ q"val p = $p; p.__run[$l](p.$r)($scheme)"
         case q"$p.$r($args)" if p.tpe <:< typeOf[Parser] ⇒ q"val p = $p; p.__run[$l](p.$r($args))($scheme)"
         case q"$p.$r[$t]" if p.tpe <:< typeOf[Parser] ⇒ q"val p = $p; p.__run[$l](p.$r[$t])($scheme)"
-        case q"$p.$r[$t]" if p.tpe <:< typeOf[RuleX] ⇒ q"__run[$l]($ruleExpr)($scheme)"
-        case x ⇒ c.abort(x.pos, "Illegal `.run()` call base: " + x)
+        case x ⇒ q"__run[$l]($x)($scheme)"
       }
       case x ⇒ c.abort(x.pos, "Illegal `Runnable.apply` call: " + x)
     }
@@ -470,7 +469,7 @@ object Parser {
         case _                           ⇒ ctx.abort(r.tree.pos, "`rule` can only be used from within a method")
       }
     reify {
-      ctx.Expr[RuleX](opTree.renderRule(ruleName)).splice.asInstanceOf[Rule[I, O]]
+      new Rule[I, O](ctx.Expr[Boolean](opTree.renderRule(ruleName)).splice)
     }
   }
 

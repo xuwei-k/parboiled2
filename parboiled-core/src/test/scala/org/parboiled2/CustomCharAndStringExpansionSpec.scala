@@ -21,7 +21,7 @@ class CustomCharAndStringExpansionSpec extends TestParserSpec {
   "The parser" should {
 
     "allow for custom char expansion" in new TestParser0 {
-      implicit def chWithX(c: Char): Rule0 =
+      private implicit def chWithX(c: Char): Rule0 =
         if (c == EOI) rule(ch(EOI)) else rule { ch(c) ~ ch('x') }
 
       def targetRule = rule { 'a' ~ 'b' ~ EOI }
@@ -31,7 +31,7 @@ class CustomCharAndStringExpansionSpec extends TestParserSpec {
     }
 
     "allow for custom string expansion" in new TestParser0 {
-      implicit def wspStr(s: String): Rule0 = rule {
+      private implicit def wspStr(s: String): Rule0 = rule {
         str(s) ~ zeroOrMore(' ')
       }
 

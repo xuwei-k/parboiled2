@@ -26,15 +26,13 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
   sealed abstract class OpTree {
     def ruleFrame: Tree
 
-    // renders a RuleX Tree
+    // renders a Boolean Tree
     def renderRule(ruleName: String): Tree = q"""
       // split out into separate method so as to not double the rule method size
       // which would effectively decrease method inlining by about 50%
       def wrapped: Boolean = ${render(wrapped = true, ruleName)}
-      val matched =
-        if (__collectingErrors) wrapped
-        else ${render(wrapped = false)}
-      if (matched) org.parboiled2.Rule else null""" // we encode the "matched" boolean as 'ruleResult ne null'
+      if (__collectingErrors) wrapped
+      else ${render(wrapped = false)}"""
 
     // renders a Boolean Tree
     def render(wrapped: Boolean, ruleName: String = ""): Tree =
@@ -504,7 +502,7 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
   case class RuleCall(call: Tree) extends OpTree {
     def calleeName = callName(call) getOrElse c.abort(call.pos, "Illegal rule call: " + call)
     def ruleFrame = reify(RuleFrame.RuleCall(c.literal(calleeName).splice)).tree
-    def renderInner(wrapped: Boolean): Tree = q"$call ne null"
+    def renderInner(wrapped: Boolean): Tree = q"$call.matched"
   }
 
   def CharRange(lowerTree: Tree, upperTree: Tree): CharacterRange = {
@@ -576,7 +574,7 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
             val __subParser = $p
             val offset = cursor
             __subParser.copyStateFrom(this, offset)
-            try __subParser.$rule ne null
+            try __subParser.$rule.matched
             finally this.copyStateFrom(__subParser, -offset)"""
           case x ⇒ c.abort(x.pos, "Illegal runSubParser expr: " + show(x))
         }
@@ -621,7 +619,7 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
       case If(cond, thenExp, elseExp) ⇒ If(cond, expand(thenExp, wrapped), expand(elseExp, wrapped))
       case Match(selector, cases)     ⇒ Match(selector, cases.map(expand(_, wrapped).asInstanceOf[CaseDef]))
       case CaseDef(pat, guard, body)  ⇒ CaseDef(pat, guard, expand(body, wrapped))
-      case x                          ⇒ opTreePF.andThen(_.render(wrapped)).applyOrElse(tree, (t: Tree) ⇒ q"$t ne null")
+      case x                          ⇒ opTreePF.andThen(_.render(wrapped)).applyOrElse(tree, (t: Tree) ⇒ q"$t.matched")
     }
 
   @tailrec

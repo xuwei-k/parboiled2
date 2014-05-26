@@ -17,11 +17,10 @@
 package org.parboiled2
 
 import scala.annotation.unchecked.uncheckedVariance
-import scala.reflect.internal.annotations.compileTimeOnly
 import org.parboiled2.support._
 import shapeless.HList
 
-sealed trait RuleX
+sealed trait RuleX extends Any
 
 /**
  * The general model of a parser rule.
@@ -32,11 +31,7 @@ sealed trait RuleX
  * At runtime there are only two instances of this class which signal whether the rule has matched (or mismatched)
  * at the current point in the input.
  */
-sealed class Rule[-I <: HList, +O <: HList] extends RuleX {
-  // TODO: model as value class
-  // This would give us a small performance benefit.
-  // However, https://issues.scala-lang.org/browse/SI-6260 is quite a serious problem for this design,
-  // so until this issue is fixed we better stick to this non-value-class-based model
+class Rule[-I <: HList, +O <: HList](val matched: Boolean) extends AnyVal with RuleX {
 
   /**
    * Concatenates this rule with the given other one.
@@ -46,7 +41,7 @@ sealed class Rule[-I <: HList, +O <: HList] extends RuleX {
    *   Rule[A:B:C, D:E:F] ~ Rule[F, G:H] = Rule[A:B:C, D:E:G:H]
    *   Rule[A, B:C] ~ Rule[D:B:C, E:F] = Rule[D:A, E:F]
    */
-  @compileTimeOnly("Calls to `~` must be inside `rule` macro")
+  //@compileTimeOnly("Calls to `~` must be inside `rule` macro") // TODO: uncomment when https://issues.scala-lang.org/browse/SI-8498 is fixed
   def ~[I2 <: HList, O2 <: HList](that: Rule[I2, O2])(implicit i: TailSwitch[I2, O @uncheckedVariance, I @uncheckedVariance],
                                                       o: TailSwitch[O @uncheckedVariance, I2, O2]): Rule[i.Out, o.Out] = `n/a`
 
@@ -55,7 +50,7 @@ sealed class Rule[-I <: HList, +O <: HList] extends RuleX {
    * or the other one matches. If this rule doesn't match the parser is reset and the given alternative tried.
    * This operators therefore implements the "ordered choice' PEG combinator.
    */
-  @compileTimeOnly("Calls to `|` must be inside `rule` macro")
+  //@compileTimeOnly("Calls to `|` must be inside `rule` macro") // TODO: uncomment when https://issues.scala-lang.org/browse/SI-8498 is fixed
   def |[I2 <: I, O2 >: O <: HList](that: Rule[I2, O2]): Rule[I2, O2] = `n/a`
 
   /**
@@ -63,14 +58,14 @@ sealed class Rule[-I <: HList, +O <: HList] extends RuleX {
    * The resulting rule doesn't cause the parser to make any progress (i.e. match any input) and also clears out all
    * effects that the underlying rule might have had on the value stack.
    */
-  @compileTimeOnly("Calls to `unary_!` must be inside `rule` macro")
+  //@compileTimeOnly("Calls to `unary_!` must be inside `rule` macro") // TODO: uncomment when https://issues.scala-lang.org/browse/SI-8498 is fixed
   def unary_!(): Rule0 = `n/a`
 }
 
 /**
  * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
  */
-object Rule extends Rule0 {
+object Rule {
   /**
    * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
    */

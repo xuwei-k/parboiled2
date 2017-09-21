@@ -53,10 +53,9 @@ object ActionOpsBoilerplate {
       | * limitations under the License.
       | */
       |
-      |package org.parboiled2.support
+      |package org.http4s.internal.parboiled2.support
       |
-      |import shapeless._
-      |import org.parboiled2.Rule
+      |import org.http4s.internal.parboiled2.Rule
       |
       |// provides the supported `~>` "overloads" for rules of type `Rule[I, O]` as `Out`
       |// as a phantom type, which is only used for rule DSL typing

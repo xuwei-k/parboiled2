@@ -70,7 +70,6 @@ val noPublishingSettings = Seq(
 /////////////////////// DEPENDENCIES /////////////////////////
 
 def scalaReflect(v: String) = "org.scala-lang"  %  "scala-reflect"        % v       % "provided"
-val shapeless               = "com.chuusai"     %% "shapeless"            % "2.3.2" % "compile"
 val specs2MatcherExtra      = "org.specs2"      %% "specs2-matcher-extra" % "3.8.7" % "test"
 val specs2ScalaCheck        = "org.specs2"      %% "specs2-scalacheck"    % "3.8.7" % "test"
 
@@ -97,7 +96,7 @@ lazy val parboiled = crossProject.crossType(CrossType.Pure)
     mappings in (Compile, packageDoc) ++= (mappings in (parboiledCoreJS.project, Compile, packageDoc)).value
   )
   .settings(
-    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), shapeless, specs2MatcherExtra),
+    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), specs2MatcherExtra),
     mappings in (Compile, packageBin) ~= (_.groupBy(_._2).toSeq.map(_._2.head)), // filter duplicate outputs
     mappings in (Compile, packageDoc) ~= (_.groupBy(_._2).toSeq.map(_._2.head)), // filter duplicate outputs
     pomPostProcess := { // we need to remove the dependency onto the parboiledCore module from the POM
@@ -118,7 +117,7 @@ lazy val parboiledCore = crossProject.crossType(CrossType.Pure).in(file("parboil
   .settings(formattingSettings: _*)
   .settings(noPublishingSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), shapeless, specs2MatcherExtra, specs2ScalaCheck),
+    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), specs2MatcherExtra, specs2ScalaCheck),
     generateActionOps := ActionOpsBoilerplate((sourceManaged in Compile).value, streams.value),
     (sourceGenerators in Compile) += generateActionOps.taskValue)
 

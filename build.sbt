@@ -87,7 +87,7 @@ lazy val examples = project
   .dependsOn(parboiledJVM)
   .settings(commonSettings: _*)
   .settings(noPublishingSettings: _*)
-  .settings(libraryDependencies ++= Seq(specs2Core, "io.spray" %%  "spray-json" % "1.3.4"))
+  .settings(libraryDependencies ++= Seq("io.spray" %%  "spray-json" % "1.3.4"))
 
 lazy val bench = inputKey[Unit]("Runs the JSON parser benchmark with a simple standard config")
 
@@ -107,7 +107,7 @@ lazy val scalaParser = project
   .dependsOn(parboiledJVM)
   .settings(commonSettings: _*)
   .settings(noPublishingSettings: _*)
-  .settings(libraryDependencies ++= Seq(shapeless, specs2Core))
+  .settings(libraryDependencies ++= Seq(shapeless))
 
 lazy val parboiledOsgiSettings = osgiSettings ++ Seq(
   OsgiKeys.exportPackage := Seq("org.parboiled2.*;version=${Bundle-Version}"),
@@ -130,7 +130,7 @@ lazy val parboiled = crossProject(JSPlatform, JVMPlatform)
     mappings in (Compile, packageDoc) ++= (mappings in (parboiledCoreJS.project, Compile, packageDoc)).value
   )
   .settings(
-    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), shapeless, specs2Core),
+    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), shapeless),
     mappings in (Compile, packageBin) ~= (_.groupBy(_._2).toSeq.map(_._2.head)), // filter duplicate outputs
     mappings in (Compile, packageDoc) ~= (_.groupBy(_._2).toSeq.map(_._2.head)), // filter duplicate outputs
     pomPostProcess := { // we need to remove the dependency onto the parboiledCore module from the POM
@@ -152,7 +152,7 @@ lazy val parboiledCore = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(noPublishingSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), shapeless, specs2Core, specs2ScalaCheck),
+    libraryDependencies ++= Seq(scalaReflect(scalaVersion.value), shapeless),
     generateActionOps := ActionOpsBoilerplate((sourceManaged in Compile).value, streams.value),
     (sourceGenerators in Compile) += generateActionOps.taskValue)
 

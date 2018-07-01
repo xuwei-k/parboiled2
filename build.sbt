@@ -2,12 +2,12 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 import scala.xml.transform._
 import scala.xml.{Node => XNode, NodeSeq}
-import org.scalajs.sbtplugin.cross.CrossType
+import sbtcrossproject.{crossProject, CrossType}
 
 val commonSettings = Seq(
   version := "1.0.1-SNAPSHOT",
-  scalaVersion := "2.11.11",
-  crossScalaVersions := Seq("2.11.11", "2.12.3"),
+  scalaVersion := "2.11.12",
+  crossScalaVersions := Seq("2.11.12", "2.12.6"),
   organization := "org.http4s",
   homepage := Some(new URL("http://parboiled.org")),
   description := "Fork of parboiled2 for http4s, sans shapeless dependency",
@@ -70,8 +70,8 @@ val noPublishingSettings = Seq(
 /////////////////////// DEPENDENCIES /////////////////////////
 
 def scalaReflect(v: String) = "org.scala-lang"  %  "scala-reflect"        % v       % "provided"
-val specs2MatcherExtra      = "org.specs2"      %% "specs2-matcher-extra" % "3.8.7" % "test"
-val specs2ScalaCheck        = "org.specs2"      %% "specs2-scalacheck"    % "3.8.7" % "test"
+val specs2MatcherExtra      = "org.specs2"      %% "specs2-matcher-extra" % "4.3.0" % "test"
+val specs2ScalaCheck        = "org.specs2"      %% "specs2-scalacheck"    % "4.3.0" % "test"
 
 /////////////////////// PROJECTS /////////////////////////
 
@@ -80,7 +80,7 @@ lazy val root = project.in(file("."))
   .aggregate(parboiledCoreJVM, parboiledCoreJS)
   .settings(noPublishingSettings: _*)
 
-lazy val parboiled = crossProject.crossType(CrossType.Pure)
+lazy val parboiled = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .dependsOn(parboiledCore)
   .settings(commonSettings: _*)
   .settings(formattingSettings: _*)
@@ -112,7 +112,7 @@ lazy val parboiledJS = parboiled.js
 
 lazy val generateActionOps = taskKey[Seq[File]]("Generates the ActionOps boilerplate source file")
 
-lazy val parboiledCore = crossProject.crossType(CrossType.Pure).in(file("parboiled-core"))
+lazy val parboiledCore = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure).in(file("parboiled-core"))
   .settings(commonSettings: _*)
   .settings(formattingSettings: _*)
   .settings(noPublishingSettings: _*)

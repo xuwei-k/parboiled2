@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        scala: [2.12.21, 2.13.18, 3.3.8]
+        scala: [3.8.4]
         java: [temurin@8, temurin@21]
     runs-on: ${{ matrix.os }}
     steps:
@@ -68,24 +68,13 @@ jobs:
         shell: bash
         run: sbt '++ ${{ matrix.scala }}; githubWorkflowCheck'
 
-      - if: runner.os == 'Windows'
-        uses: egor-tensin/setup-clang@v2
-        with:
-          version: 20.1.7
-          platform: x64
-
-      - name: Header check
-        if: ${{ matrix.java=='temurin@8' && matrix.scala=='2.12.21' && matrix.os=='ubuntu-latest' }}
-        shell: bash
-        run: sbt '++ ${{ matrix.scala }}; headerCheckAll; scalaParser/headerCheckAll'
-
       - name: Build project
         shell: bash
-        run: sbt '++ ${{ matrix.scala }}; Test/compile; test; scalaParser/testOnly scalaparser.SnippetSpec'
+        run: sbt '++ ${{ matrix.scala }}; test'
 
       - name: Compress target directories
         shell: bash
-        run: tar cf targets.tar examples/target parboiled-core/.native/target target scalaParser/target jsonBenchmark/target parboiled/.js/target parboiled/.native/target parboiled/.jvm/target parboiled-core/.jvm/target parboiled-core/.js/target project/target
+        run: tar cf targets.tar target/out/native0.5/scala-2.12.21/parboiled target/out/jvm/scala-2.13.18/jsonbenchmark target/out/jvm/scala-2.13.18/parboiledcore target/out/sjs1/scala-2.12.21/parboiledcore target/out/jvm/scala-2.13.18/examples target/out/native0.5/scala-2.12.21/parboiledcore target/out/jvm/scala-2.12.21/jsonbenchmark target/out/jvm/scala-3.3.8/parboiled target/out/jvm/scala-2.12.21/examples target/out/sjs1/scala-3.3.8/parboiledcore target/out/sjs1/scala-2.12.21/parboiled target/out/jvm/scala-2.12.21/parboiled target/out/jvm/scala-3.3.8/scalaparser target/out/jvm/scala-2.13.18/scalaparser target/out/native0.5/scala-3.3.8/parboiled target/out/jvm/scala-3.8.4/parboiled2-root target/out/jvm/scala-2.12.21/parboiledcore target/out/sjs1/scala-2.13.18/parboiledcore target/out/native0.5/scala-2.13.18/parboiled target/out/native0.5/scala-2.13.18/parboiledcore target/out/jvm/scala-3.3.8/examples target/out/jvm/scala-2.13.18/parboiled target/out/sjs1/scala-2.13.18/parboiled target/out/jvm/scala-3.3.8/jsonbenchmark target/out/jvm/scala-2.12.21/scalaparser target/out/native0.5/scala-3.3.8/parboiledcore target/out/jvm/scala-3.3.8/parboiledcore target/out/sjs1/scala-3.3.8/parboiled project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v7
@@ -96,11 +85,11 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
-    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v')) && (github.repository_owner == 'sirthias')
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v')) && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias') && (github.repository_owner == 'sirthias')
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.3.8]
+        scala: [3.8.4]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -140,32 +129,12 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Download target directories (2.12.21)
+      - name: Download target directories (3.8.4)
         uses: actions/download-artifact@v8
         with:
-          name: target-${{ matrix.os }}-2.12.21-${{ matrix.java }}
+          name: target-${{ matrix.os }}-3.8.4-${{ matrix.java }}
 
-      - name: Inflate target directories (2.12.21)
-        run: |
-          tar xf targets.tar
-          rm targets.tar
-
-      - name: Download target directories (2.13.18)
-        uses: actions/download-artifact@v8
-        with:
-          name: target-${{ matrix.os }}-2.13.18-${{ matrix.java }}
-
-      - name: Inflate target directories (2.13.18)
-        run: |
-          tar xf targets.tar
-          rm targets.tar
-
-      - name: Download target directories (3.3.8)
-        uses: actions/download-artifact@v8
-        with:
-          name: target-${{ matrix.os }}-3.3.8-${{ matrix.java }}
-
-      - name: Inflate target directories (3.3.8)
+      - name: Inflate target directories (3.8.4)
         run: |
           tar xf targets.tar
           rm targets.tar

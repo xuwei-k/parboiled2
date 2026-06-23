@@ -119,8 +119,8 @@ lazy val parboiledOsgiSettings = osgiSettings ++ Seq(
 
 /////////////////////// DEPENDENCIES /////////////////////////
 
-val utest           = Def.setting("com.lihaoyi" %%% "utest" % "0.8.4" % Test)
-val scalaCheck      = Def.setting("org.scalacheck" %%% "scalacheck" % "1.19.0" % Test)
+val utest           = Def.setting("com.lihaoyi" %% "utest" % "0.8.4" % Test)
+val scalaCheck      = Def.setting("org.scalacheck" %% "scalacheck" % "1.19.0" % Test)
 val `scala-reflect` = Def.setting("org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided)
 
 // benchmarks and examples only
@@ -167,7 +167,7 @@ lazy val jsonBenchmark = projectMatrix
   .settings(
     publish / skip := true,
     libraryDependencies ++= Seq(`json4s-native`, `json4s-jackson`),
-    bench := (Compile / run).partialInput(" -i 10 -wi 10 -f1 -t1").evaluated
+    bench := (Compile / run).toTask(" -i 10 -wi 10 -f1 -t1").value
   )
 
 lazy val scalaParser = projectMatrix
@@ -227,6 +227,7 @@ lazy val parboiled = projectMatrix
     projectDependencies := projectDependencies.value.filterNot(_.name.equalsIgnoreCase("parboiledcore"))
   )
 
+@transient
 lazy val generateActionOps = taskKey[Seq[File]]("Generates the ActionOps boilerplate source file")
 
 lazy val parboiledCore = projectMatrix
@@ -262,7 +263,7 @@ lazy val parboiledCore = projectMatrix
     )
   )
 
-ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
+ThisBuild / githubWorkflowTargetTags := Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches :=
   Seq(
     RefPredicate.StartsWith(Ref.Tag("v"))
@@ -288,7 +289,7 @@ ThisBuild / githubWorkflowWindowsPagefileFix := Some(
   windows.PagefileFix("4GB", "16GB")
 )
 
-ThisBuild / githubWorkflowBuild := Seq(
+LocalRootProject / githubWorkflowBuild := Seq(
   WorkflowStep.Use(
     ref = UseRef.Public("egor-tensin", "setup-clang", "v2"),
     cond = Some("runner.os == 'Windows'"),
@@ -316,7 +317,7 @@ ThisBuild / githubWorkflowBuild := Seq(
   )
 )
 
-ThisBuild / githubWorkflowGeneratedCI ~= {
+LocalRootProject / githubWorkflowGeneratedCI ~= {
   _.map {
     case x if x.id == "publish" =>
       x.copy(cond = x.cond.map(_ + " && (github.repository_owner == 'sirthias')"))
